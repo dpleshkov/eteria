@@ -14,8 +14,13 @@ app.secret_key = "taksa tapka"
 socketio = SocketIO(app)
 sys.setrecursionlimit(100000)
 game = Game()
-for _ in range(0, 4000):
-    Coin(game, random.randint(-4000, 4000), random.randint(-4000, 4000), 1)
+for _ in range(0, 500):
+    Wall(game, random.randint(-2000, 2000), random.randint(-2000, 2000))
+for _ in range(0, 2000):
+    coin = Coin(game, random.randint(-2000, 2000), random.randint(-2000, 2000), 1)
+    while coin.colliding():
+        coin.delete()
+        coin = Coin(game, random.randint(-2000, 2000), random.randint(-2000, 2000), 1)
 players = dict()
 
 
@@ -38,7 +43,7 @@ def connect():
 
 @socketio.on("playerRequest")
 def add_player(data):
-    player = Player(game, random.randint(-4000, 4000), random.randint(-4000, 4000), data["name"])
+    player = Player(game, random.randint(-2000, 2000), random.randint(-2000, 2000), data["name"])
     #  The client already knows that we are going to initialize a new player, but they don't know the coordinates
     players[data["token"]] = player
     print("Assigned #"+data["token"]+" a new player object with name "+data["name"])
@@ -49,15 +54,13 @@ def add_player(data):
 def send_info(data):
     players[data["token"]].ping = time.time()
     if data["angle"] == -1:
-        players[data["token"]].vel_x = 0
-        players[data["token"]].vel_y = 0
+        players[data["token"]].set_velocity(0, 0)
     else:
-        players[data["token"]].vel_x = math.cos(math.radians(data["angle"]))*5
-        players[data["token"]].vel_y = math.sin(math.radians(data["angle"]))*5
+        players[data["token"]].set_velocity(math.cos(math.radians(data["angle"]))*5, math.sin(math.radians(data["angle"]))*5)
     emit("playerInfoResponse", [players[data["token"]].jsonify(), players[data["token"]].view])
-
 
 
 if __name__ == '__main__':
     set_interval(game.update, 0.04)
+    print("Running")
     socketio.run(app, port=os.environ.get("PORT"), host="0.0.0.0")

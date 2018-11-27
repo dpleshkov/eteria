@@ -47,6 +47,8 @@ function init() {
         }
         var scale = canvas.width/600;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         var player = data[0];
         var entities = data[1];
         entities.forEach(function (entity) {
@@ -56,8 +58,8 @@ function init() {
             ctx.beginPath();
             ctx.arc(cx*scale, cy*scale, entity.radius*scale, 0, 2 * Math.PI);
             ctx.fill();
-            if (entity.it == "player") {
-                ctx.fillStyle = "#000000";
+            if (entity.name !== undefined) {
+                ctx.fillStyle = "#ffffff";
                 ctx.textAlign="center";
                 ctx.fillText(entity.name, cx*scale, cy*scale + 30*scale);
             }
