@@ -58,7 +58,9 @@ class Entity:
             "y": self.y,
             "radius": self.radius,
             "it": self.it,
-            "color": self.color
+            "color": self.color,
+            "vel_x": self.vel_x,
+            "vel_y": self.vel_y
         }
 
 
@@ -136,5 +138,7 @@ class Player(Entity):
             "name": self.name,
             "color": self.color,
             "score": self.score,
-            "hp": self.hp
+            "hp": self.hp,
+            "vel_x": self.vel_x,
+            "vel_y": self.vel_y
         }
