@@ -13,7 +13,7 @@ class Game:
         for entity in list(self.entities):
             entity.act()
         t2 = time.time()
-        self.running_time = t2-t1
+        self.running_time = round((t2-t1)*1000)
         thr = threading.Thread(target=self.update)
         thr.start()
 
@@ -41,8 +41,8 @@ class Entity:
         del self
 
     def act(self):
-        self.x += self.vel_x * (self.game.running_time*25)
-        self.y += self.vel_y * (self.game.running_time*25)
+        self.x += self.vel_x * (self.game.running_time/40)
+        self.y += self.vel_y * (self.game.running_time/40)
 
     def colliding(self):
         for entity in self.game.entities:

@@ -12,6 +12,7 @@ var time = Date.now();
 var data;
 var rendering = false;
 var ping = 40;
+var runningTime = 1;
 var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
 socket.on("token", function(data) {
     if (token === undefined) {
@@ -27,7 +28,7 @@ canvas.onmousemove = function(evt) { // This is the function that changes the pl
         angle = (Math.atan2(my, mx) * 180 / Math.PI);
     }
 }
-$("#nameForm").submit(function(evt) {
+$("#nameForm").submit(function(evt) { // Sends our name to the server
     var name = document.getElementById('name').value;
     if (name.length === 0) {
         name = "Guest"
@@ -41,11 +42,14 @@ $("#nameForm").submit(function(evt) {
 });
 
 function onBoardCalculations() {
+    var t1 = Date.now();
     var entities = data[1];
     entities.forEach(function(entity) {
-        entity.x += entity.vel_x;
-        entity.y += entity.vel_y;
+        entity.x += entity.vel_x * (runningTime/40);
+        entity.y += entity.vel_y * (runningTime/40);
     })
+    var t2 = Date.now();
+    runningTime = t2-t1;
 }
 
 function render(timestamp) {
@@ -74,10 +78,19 @@ function render(timestamp) {
     window.requestAnimationFrame(render);
 }
 socket.on("playerInfoResponse", function(stuff) {
+    if (data) {
+        var dx = stuff[0].x - data[0].x;
+        var dy = stuff[0].y - data[0].y;
+        console.log(dx, dy);
+    }
     data = stuff;
     ping = Date.now() - time;
     time = Date.now();
-    console.log(ping, stuff);
+    if (!rendering) {
+        window.requestAnimationFrame(render);
+        onBoardCalculations();
+        rendering = true;
+    }
     if (data.length === 0) { // If the message is empty that means the player was just initialized.
         setTimeout(function() {
             socket.emit("playerInfoRequest", {
@@ -86,11 +99,6 @@ socket.on("playerInfoResponse", function(stuff) {
             })
         }, 40 - ping);
         return;
-    }
-    if (!rendering) {
-        window.requestAnimationFrame(render);
-        setInterval(onBoardCalculations, 40);
-        rendering = true;
     }
     setTimeout(function() {
         socket.emit("playerInfoRequest", {

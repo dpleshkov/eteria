@@ -57,7 +57,7 @@ def send_info(data):
         players[data["token"]].set_velocity(0, 0)
     else:
         players[data["token"]].set_velocity(math.cos(math.radians(data["angle"]))*5, math.sin(math.radians(data["angle"]))*5)
-    emit("playerInfoResponse", [players[data["token"]].jsonify(), players[data["token"]].view])
+    emit("playerInfoResponse", [players[data["token"]].jsonify(), players[data["token"]].view, game.running_time])
 
 
 if __name__ == '__main__':
