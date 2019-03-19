@@ -42,6 +42,7 @@ function init() {
     });
 
     function render() {
+        var time1 = Date.now();
         var scale = canvas.width / 600;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "#000000";
@@ -60,10 +61,12 @@ function init() {
                 ctx.textAlign = "center";
                 ctx.fillText(entity.name, cx * scale, cy * scale + 30 * scale);
             }
-            entity.x += entity.vel_x * (ping/40);
-            entity.y += entity.vel_y * (ping/40);
+            entity.x += entity.vel_x;
+            entity.y += entity.vel_y;
         })
-        setTimeout(render, 40);
+        var time2 = Date.now();
+        var diff = time2 - time1;
+        setTimeout(render, 40-diff);
     }
     socket.on("playerInfoResponse", function(stuff) {
         data = stuff;

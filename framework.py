@@ -5,10 +5,14 @@ import math
 class Game:
     def __init__(self):
         self.entities = set()
+        self.running_time = 0.01
 
     def update(self):
+        t1 = time.time()
         for entity in list(self.entities):
             entity.act()
+        t2 = time.time()
+        self.running_time = t2-t1
 
     def add_entity(self, entity):
         self.entities.add(entity)
@@ -34,8 +38,8 @@ class Entity:
         del self
 
     def act(self):
-        self.x += self.vel_x
-        self.y += self.vel_y
+        self.x += self.vel_x * (self.game.running_time*25)
+        self.y += self.vel_y * (self.game.running_time*25)
 
     def colliding(self):
         for entity in self.game.entities:
