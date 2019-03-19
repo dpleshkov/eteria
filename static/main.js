@@ -12,6 +12,7 @@ function init() {
     var time = Date.now();
     var data;
     var rendering = false;
+    var ping = 40;
     var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
     socket.on("token", function(data) {
         if (token === undefined) {
@@ -59,13 +60,14 @@ function init() {
                 ctx.textAlign = "center";
                 ctx.fillText(entity.name, cx * scale, cy * scale + 30 * scale);
             }
-            entity.x += entity.vel_x;
-            entity.y += entity.vel_y;
+            entity.x += entity.vel_x * (ping/40);
+            entity.y += entity.vel_y * (ping/40);
         })
+        setTimeout(render, 40);
     }
     socket.on("playerInfoResponse", function(stuff) {
         data = stuff;
-        var ping = Date.now() - time;
+        ping = Date.now() - time;
         time = Date.now();
         console.log(ping, stuff);
         if (data.length === 0) { // If the message is empty that means the player was just initialized.
@@ -78,7 +80,7 @@ function init() {
             return;
         }
         if (!rendering) {
-            setInterval(render, 40);
+            render();
             rendering = true;
         }
         setTimeout(function() {

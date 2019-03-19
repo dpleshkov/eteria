@@ -107,7 +107,7 @@ class Player(Entity):
     def handle_collisions(self):
         self.view = list()
         for entity in list(self.game.entities):
-            if abs(self.x-entity.x) < 300 and abs(self.y-entity.y) < 300:
+            if abs(self.x-entity.x) < 300+entity.radius and abs(self.y-entity.y) < 300+entity.radius:
                 self.view.append(entity.jsonify())
             if self.colliding_with(entity):
                 if type(entity) == Coin:
