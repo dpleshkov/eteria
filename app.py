@@ -61,6 +61,6 @@ def send_info(data):
 
 
 if __name__ == '__main__':
-    set_interval(game.update, 0.001)
+    game.update()
     print("Running")
     socketio.run(app, port=os.environ.get("PORT"), host="0.0.0.0")

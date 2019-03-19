@@ -1,5 +1,6 @@
 import time
 import math
+import threading
 
 
 class Game:
@@ -13,6 +14,8 @@ class Game:
             entity.act()
         t2 = time.time()
         self.running_time = t2-t1
+        thr = threading.Thread(target=self.update)
+        thr.start()
 
     def add_entity(self, entity):
         self.entities.add(entity)
@@ -109,10 +112,10 @@ class Player(Entity):
             self.vel_y = 0
 
     def handle_collisions(self):
-        self.view = list()
+        self.new_view = list()
         for entity in list(self.game.entities):
             if abs(self.x-entity.x) < 300+entity.radius and abs(self.y-entity.y) < 300+entity.radius:
-                self.view.append(entity.jsonify())
+                self.new_view.append(entity.jsonify())
             if self.colliding_with(entity):
                 if type(entity) == Coin:
                     self.score += entity.value
@@ -125,6 +128,7 @@ class Player(Entity):
                         self.y += self.vel_y
                     self.vel_x = -self.vel_x
                     self.vel_y = -self.vel_y
+        self.view = self.new_view
 
     def act(self):
         if time.time() - self.ping >= 3:
