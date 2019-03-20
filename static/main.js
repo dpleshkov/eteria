@@ -10,12 +10,19 @@ document.body.style.overflow = "hidden";
 
 var token;
 var angle = 0;
+var actualAngle = 0;
 var time = Date.now();
 var data;
 var rendering = false;
 var ping = 40;
 var runningTime = 1;
 var firing = false;
+var keysDown = {
+    "w": false,
+    "a": false,
+    "s": false,
+    "d": false
+}
 var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
 
 
@@ -25,6 +32,12 @@ socket.on("token", function(data) {
         token = data;
     }
 });
+document.onkeydown = function(evt) {
+    keysDown[evt.key] = true;
+}
+document.onkeyup = function(evt) {
+    keysDown[evt.key] = false;
+}
 canvas.onmousemove = function(evt) { // This is the function that changes the player direction when the player moves their mouse.
     var mx = evt.pageX - $('#render').offset().left - (canvas.width / 2);
     var my = evt.pageY - $('#render').offset().top - (canvas.height / 2);
@@ -33,6 +46,7 @@ canvas.onmousemove = function(evt) { // This is the function that changes the pl
     } else {
         angle = (Math.atan2(my, mx) * 180 / Math.PI);
     }
+    actualAngle = (Math.atan2(my, mx) * 180 / Math.PI);
 }
 canvas.onmousedown = function(evt) {
     if (evt.button == 0) {
@@ -144,8 +158,9 @@ socket.on("playerInfoResponse", function(stuff) {
         setTimeout(function() {
             socket.emit("playerInfoRequest", {
                 token: token,
-                angle: angle,
-                firing: firing
+                angle: actualAngle,
+                firing: firing,
+                keysDown: keysDown
             })
         }, 1);
         return;
@@ -153,8 +168,9 @@ socket.on("playerInfoResponse", function(stuff) {
     setTimeout(function() {
         socket.emit("playerInfoRequest", {
             token: token,
-            angle: angle,
-            firing: firing
+            angle: actualAngle,
+            firing: firing,
+            keysDown: keysDown
         })
     }, 1);
 });

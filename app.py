@@ -55,10 +55,21 @@ def send_info(data):
     players[data["token"]].ping = time.time()
     if data["firing"]:
         players[data["token"]].fire_bullet(data["angle"])
-    if data["angle"] == -1:
-        players[data["token"]].set_velocity(0, 0)
-    else:
-        players[data["token"]].set_velocity(math.cos(math.radians(data["angle"]))*5, math.sin(math.radians(data["angle"]))*5)
+    #if data["angle"] == -1:
+    #    players[data["token"]].set_velocity(0, 0)
+    #else:
+    #    players[data["token"]].set_velocity(math.cos(math.radians(data["angle"]))*5, math.sin(math.radians(data["angle"]))*5)
+    vx = 0
+    vy = 0
+    if data["keysDown"]["w"]:
+        vy -= 5
+    if data["keysDown"]["s"]:
+        vy += 5
+    if data["keysDown"]["a"]:
+        vx -= 5
+    if data["keysDown"]["d"]:
+        vx += 5
+    players[data["token"]].set_velocity(vx, vy)
     emit("playerInfoResponse", [players[data["token"]].jsonify(), players[data["token"]].view, game.running_time])
 
 
