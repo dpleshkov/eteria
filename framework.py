@@ -124,17 +124,14 @@ class Player(Entity):
                     entity.delete()
                 if type(entity) == Wall:
                     if entity.y > self.y and velocity_queue[1] > 0:
-                        velocity_queue[1] = 0# - self.vel_y
+                        velocity_queue[1] = -velocity_queue[1]
                     if entity.y < self.y and velocity_queue[1] < 0:
-                        velocity_queue[1] = 0# - self.vel_y
+                        velocity_queue[1] = -velocity_queue[1]# - self.vel_y
                     if entity.x > self.x and velocity_queue[0] > 0:
-                        velocity_queue[0] = 0# - self.vel_x
+                        velocity_queue[0] = -velocity_queue[0]# - self.vel_x
                     if entity.x < self.x and velocity_queue[0] < 0:
-                        velocity_queue[0] = 0# - self.vel_x
+                        velocity_queue[0] = -velocity_queue[0]# - self.vel_x
 
-                    while self.colliding_with(entity):
-                        self.x += -self.vel_x/2
-                        self.y += -self.vel_y/2
 
         self.view = self.new_view
         self.vel_x = velocity_queue[0]
