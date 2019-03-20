@@ -58,6 +58,9 @@ function render(timestamp) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "#000000";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#ffffff";
+    ctx.textAlign = "left";
+    ctx.fillText(ping+"ms", 20*scale, 20*scale);
     var player = data[0];
     var entities = data[1];
     entities.forEach(function(entity) {
@@ -97,7 +100,7 @@ socket.on("playerInfoResponse", function(stuff) {
                 token: token,
                 angle: angle
             })
-        }, 40 - ping);
+        }, 1);
         return;
     }
     setTimeout(function() {
@@ -105,5 +108,5 @@ socket.on("playerInfoResponse", function(stuff) {
             token: token,
             angle: angle
         })
-    }, 40 - ping);
+    }, 1);
 });

@@ -98,21 +98,23 @@ class Player(Entity):
         self.it = "player"
         self.ping = time.time()
         self.hp = 100
+        self.velocity_queue = [0, 0]
 
     def set_velocity(self, vel_x, vel_y):
-        self.vel_x = vel_x
-        self.vel_y = vel_y
+        self.velocity_queue[0] = vel_x
+        self.velocity_queue[1] = vel_y
         if self.x > 2000 and self.vel_x > 0:
-            self.vel_x = 0
+            self.velocity_queue[0] = 0
         if self.y > 2000 and self.vel_y > 0:
-            self.vel_y = 0
+            self.velocity_queue[1] = 0
         if self.x < -2000 and self.vel_x < 0:
-            self.vel_x = 0
+            self.velocity_queue[0] = 0
         if self.y < -2000 and self.vel_y < 0:
-            self.vel_y = 0
+            self.velocity_queue[1] = 0
 
     def handle_collisions(self):
         self.new_view = list()
+        velocity_queue = self.velocity_queue
         for entity in list(self.game.entities):
             if abs(self.x-entity.x) < 300+entity.radius and abs(self.y-entity.y) < 300+entity.radius:
                 self.new_view.append(entity.jsonify())
@@ -121,14 +123,22 @@ class Player(Entity):
                     self.score += entity.value
                     entity.delete()
                 if type(entity) == Wall:
-                    self.vel_x = -self.vel_x
-                    self.vel_y = -self.vel_y
+                    if entity.y > self.y and velocity_queue[1] > 0:
+                        velocity_queue[1] = 0# - self.vel_y
+                    if entity.y < self.y and velocity_queue[1] < 0:
+                        velocity_queue[1] = 0# - self.vel_y
+                    if entity.x > self.x and velocity_queue[0] > 0:
+                        velocity_queue[0] = 0# - self.vel_x
+                    if entity.x < self.x and velocity_queue[0] < 0:
+                        velocity_queue[0] = 0# - self.vel_x
+
                     while self.colliding_with(entity):
-                        self.x += self.vel_x
-                        self.y += self.vel_y
-                    self.vel_x = -self.vel_x
-                    self.vel_y = -self.vel_y
+                        self.x += -self.vel_x/2
+                        self.y += -self.vel_y/2
+
         self.view = self.new_view
+        self.vel_x = velocity_queue[0]
+        self.vel_y = velocity_queue[1]
 
     def act(self):
         if time.time() - self.ping >= 3:
