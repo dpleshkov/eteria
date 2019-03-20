@@ -6,6 +6,8 @@ canvas.width = $(document).height();
 canvas.height = $(document).height();
 document.body.style.overflow = "hidden";
 
+
+
 var token;
 var angle = 0;
 var time = Date.now();
@@ -13,7 +15,11 @@ var data;
 var rendering = false;
 var ping = 40;
 var runningTime = 1;
+var firing = false;
 var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+
+
+
 socket.on("token", function(data) {
     if (token === undefined) {
         token = data;
@@ -26,6 +32,16 @@ canvas.onmousemove = function(evt) { // This is the function that changes the pl
         angle = -1
     } else {
         angle = (Math.atan2(my, mx) * 180 / Math.PI);
+    }
+}
+canvas.onmousedown = function(evt) {
+    if (evt.button == 1) {
+        firing = true;
+    }
+}
+canvas.onmouseup = function(evt) {
+    if (evt.button == 1) {
+        firing = false;
     }
 }
 $("#nameForm").submit(function(evt) { // Sends our name to the server
@@ -98,7 +114,8 @@ socket.on("playerInfoResponse", function(stuff) {
         setTimeout(function() {
             socket.emit("playerInfoRequest", {
                 token: token,
-                angle: angle
+                angle: angle,
+                firing: firing
             })
         }, 1);
         return;
@@ -106,7 +123,8 @@ socket.on("playerInfoResponse", function(stuff) {
     setTimeout(function() {
         socket.emit("playerInfoRequest", {
             token: token,
-            angle: angle
+            angle: angle,
+            firing: firing
         })
     }, 1);
 });

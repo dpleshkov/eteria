@@ -88,6 +88,17 @@ class Wall(Entity):
         self.color = "#ffffff"
 
 
+class Bullet(Entity):
+    def __init__(self, game, x, y, sender, vel_x, vel_y):
+        Entity.init(self, game, x, y)
+        self.radius = 5
+        self.it = "bullet"
+        self.color = "#ff0000"
+        self.sender = sender
+        self.vel_x = vel_x
+        self.vel_y = vel_y
+
+
 class Player(Entity):
     def __init__(self, game, x, y, name):
         Entity.__init__(self, game, x, y)
@@ -131,6 +142,10 @@ class Player(Entity):
                         velocity_queue[0] = -velocity_queue[0]# - self.vel_x
                     if entity.x < self.x and velocity_queue[0] < 0:
                         velocity_queue[0] = -velocity_queue[0]# - self.vel_x
+                if type(entity) == Bullet:
+                    if entity.sender != self:
+                        self.hp -= 10;
+                        entity.delete();
 
 
         self.view = self.new_view

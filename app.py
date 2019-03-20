@@ -14,9 +14,9 @@ app.secret_key = "taksa tapka"
 socketio = SocketIO(app)
 sys.setrecursionlimit(100000)
 game = Game()
-for _ in range(0, 500):
+for _ in range(0, 200):
     Wall(game, random.randint(-2000, 2000), random.randint(-2000, 2000))
-for _ in range(0, 2000):
+for _ in range(0, 500):
     coin = Coin(game, random.randint(-2000, 2000), random.randint(-2000, 2000), 1)
     while coin.colliding():
         coin.delete()
