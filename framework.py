@@ -90,13 +90,19 @@ class Wall(Entity):
 
 class Bullet(Entity):
     def __init__(self, game, x, y, sender, vel_x, vel_y):
-        Entity.init(self, game, x, y)
+        Entity.__init__(self, game, x, y)
         self.radius = 5
         self.it = "bullet"
         self.color = "#ff0000"
         self.sender = sender
         self.vel_x = vel_x
         self.vel_y = vel_y
+        self.birth_date = time.time()
+
+    def act(self):
+        Entity.act(self);
+        if time.time() - self.birth_date > 5:
+            self.delete()
 
 
 class Player(Entity):
@@ -110,18 +116,32 @@ class Player(Entity):
         self.ping = time.time()
         self.hp = 100
         self.velocity_queue = [0, 0]
+        self.last_fired = time.time()
+        self.dead = False
+        self.dying_timer = time.time()
 
     def set_velocity(self, vel_x, vel_y):
+        if self.dead:
+            return
         self.velocity_queue[0] = vel_x
         self.velocity_queue[1] = vel_y
         if self.x > 2000 and self.vel_x > 0:
-            self.velocity_queue[0] = 0
+            self.velocity_queue[0] = -self.velocity_queue[0]
         if self.y > 2000 and self.vel_y > 0:
-            self.velocity_queue[1] = 0
+            self.velocity_queue[1] = -self.velocity_queue[1]
         if self.x < -2000 and self.vel_x < 0:
-            self.velocity_queue[0] = 0
+            self.velocity_queue[0] = -self.velocity_queue[0]
         if self.y < -2000 and self.vel_y < 0:
-            self.velocity_queue[1] = 0
+            self.velocity_queue[1] = -self.velocity_queue[1]
+
+    def fire_bullet(self, direction):
+        if self.dead:
+            return
+        vx = math.cos(math.radians(direction))
+        vy = math.sin(math.radians(direction))
+        if (time.time() - self.last_fired > 0.5):
+            Bullet(self.game, self.x, self.y, self, vx*25, vy*25)
+            self.last_fired = time.time()
 
     def handle_collisions(self):
         self.new_view = list()
@@ -149,13 +169,19 @@ class Player(Entity):
 
 
         self.view = self.new_view
-        self.vel_x = velocity_queue[0]
-        self.vel_y = velocity_queue[1]
+        if not self.dead:
+            self.vel_x = velocity_queue[0]
+            self.vel_y = velocity_queue[1]
 
     def act(self):
         if time.time() - self.ping >= 3:
             print("Player "+self.name+" has disconnected")
             self.delete()
+        if self.hp <= 0:
+            self.dead = True
+            self.dying_timer = time.time()
+            self.vel_x = 0
+            self.vel_y = 0
         Entity.act(self)
         self.handle_collisions()
 
@@ -170,5 +196,6 @@ class Player(Entity):
             "score": self.score,
             "hp": self.hp,
             "vel_x": self.vel_x,
-            "vel_y": self.vel_y
+            "vel_y": self.vel_y,
+            "dead": self.dead
         }

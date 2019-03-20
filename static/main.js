@@ -35,12 +35,12 @@ canvas.onmousemove = function(evt) { // This is the function that changes the pl
     }
 }
 canvas.onmousedown = function(evt) {
-    if (evt.button == 1) {
+    if (evt.button == 0) {
         firing = true;
     }
 }
 canvas.onmouseup = function(evt) {
-    if (evt.button == 1) {
+    if (evt.button == 0) {
         firing = false;
     }
 }
@@ -61,11 +61,11 @@ function onBoardCalculations() {
     var t1 = Date.now();
     var entities = data[1];
     entities.forEach(function(entity) {
-        entity.x += entity.vel_x * (runningTime/40);
-        entity.y += entity.vel_y * (runningTime/40);
+        entity.x += entity.vel_x * (runningTime / 40);
+        entity.y += entity.vel_y * (runningTime / 40);
     })
     var t2 = Date.now();
-    runningTime = t2-t1;
+    runningTime = t2 - t1;
 }
 
 function render(timestamp) {
@@ -76,7 +76,8 @@ function render(timestamp) {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "#ffffff";
     ctx.textAlign = "left";
-    ctx.fillText(ping+"ms", 20*scale, 20*scale);
+    ctx.font = "16px Arial";
+    ctx.fillText(ping + "ms", 20 * scale, 20 * scale);
     var player = data[0];
     var entities = data[1];
     entities.forEach(function(entity) {
@@ -89,9 +90,38 @@ function render(timestamp) {
         if (entity.name !== undefined) {
             ctx.fillStyle = "#ffffff";
             ctx.textAlign = "center";
+            ctx.font = "16px Arial";
             ctx.fillText(entity.name, cx * scale, cy * scale + 30 * scale);
         }
-    })
+        if (entity.it == "player") {
+            ctx.beginPath();
+            ctx.strokeStyle = "#aa0000";
+            ctx.lineCap = "round";
+            ctx.lineWidth = 10;
+            ctx.moveTo(cx * scale - (20 * scale), cy * scale + (40 * scale));
+            ctx.lineTo(cx * scale + (20 * scale), cy * scale + (40 * scale));
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.strokeStyle = "#00aa00";
+            ctx.lineCap = "round";
+            ctx.lineWidth = 8;
+            if (entity.hp > 0) {
+                let healthThing = entity.hp / 2.5
+                ctx.moveTo(cx * scale - (20 * scale), cy * scale + (40 * scale));
+                ctx.lineTo(cx * scale + ((healthThing - 20) * scale), cy * scale + (40 * scale));
+                ctx.stroke();
+            }
+        }
+    });
+    if (player.dead) {
+        ctx.fillStyle = "#ff0000";
+        ctx.font = "100px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("You died :(", 300 * scale, 300 * scale);
+        setTimeout(function() {
+            location.reload(true)
+        }, 3000);
+    }
     var time2 = Date.now();
     var diff = time2 - time1;
     window.requestAnimationFrame(render);
