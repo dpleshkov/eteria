@@ -26,7 +26,9 @@ var keysDown = {
 var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
 
 
-
+function radians(degrees) {
+    return degrees / 180 * Math.PI;
+}
 socket.on("token", function(data) {
     if (token === undefined) {
         token = data;
@@ -109,6 +111,14 @@ function render(timestamp) {
         }
         if (entity.it == "player") {
             ctx.beginPath();
+            ctx.strokeStyle = "#999999";
+            ctx.lineCap = "round";
+            ctx.lineWidth = 10;
+            ctx.moveTo(cx*scale, cy*scale);
+            //ctx.lineTo(cx*scale+5, cy*scale+5);
+            ctx.lineTo((cx*scale)+(Math.cos(radians(entity.direction))*scale*50), (cy*scale)+(Math.sin(radians(entity.direction))*scale*50));
+            ctx.stroke();
+            ctx.beginPath();
             ctx.strokeStyle = "#aa0000";
             ctx.lineCap = "round";
             ctx.lineWidth = 10;
@@ -120,7 +130,8 @@ function render(timestamp) {
             ctx.lineCap = "round";
             ctx.lineWidth = 8;
             if (entity.hp > 0) {
-                let healthThing = entity.hp / 2.5
+                let healthThing = entity.hp / 2.5;
+                ctx.beginPath();
                 ctx.moveTo(cx * scale - (20 * scale), cy * scale + (40 * scale));
                 ctx.lineTo(cx * scale + ((healthThing - 20) * scale), cy * scale + (40 * scale));
                 ctx.stroke();

@@ -119,6 +119,7 @@ class Player(Entity):
         self.last_fired = time.time()
         self.dead = False
         self.dying_timer = time.time()
+        self.direction = 0
 
     def set_velocity(self, vel_x, vel_y):
         if self.dead:
@@ -197,5 +198,6 @@ class Player(Entity):
             "hp": self.hp,
             "vel_x": self.vel_x,
             "vel_y": self.vel_y,
-            "dead": self.dead
+            "dead": self.dead,
+            "direction": self.direction
         }

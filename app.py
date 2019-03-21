@@ -55,6 +55,7 @@ def send_info(data):
     players[data["token"]].ping = time.time()
     if data["firing"]:
         players[data["token"]].fire_bullet(data["angle"])
+    players[data["token"]].direction = data["angle"]
     #if data["angle"] == -1:
     #    players[data["token"]].set_velocity(0, 0)
     #else:
