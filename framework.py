@@ -4,9 +4,10 @@ import threading
 
 
 class Game:
-    def __init__(self):
+    def __init__(self, radius=2000):
         self.entities = set()
         self.running_time = 0.01
+        self.radius = radius
 
     def update(self):
         t1 = time.time()
@@ -126,13 +127,13 @@ class Player(Entity):
             return
         self.velocity_queue[0] = vel_x
         self.velocity_queue[1] = vel_y
-        if self.x > 2000 and self.vel_x > 0:
+        if self.x > self.game.radius and self.vel_x > 0:
             self.velocity_queue[0] = -self.velocity_queue[0]
-        if self.y > 2000 and self.vel_y > 0:
+        if self.y > self.game.radius and self.vel_y > 0:
             self.velocity_queue[1] = -self.velocity_queue[1]
-        if self.x < -2000 and self.vel_x < 0:
+        if self.x < -self.game.radius and self.vel_x < 0:
             self.velocity_queue[0] = -self.velocity_queue[0]
-        if self.y < -2000 and self.vel_y < 0:
+        if self.y < -self.game.radius and self.vel_y < 0:
             self.velocity_queue[1] = -self.velocity_queue[1]
 
     def fire_bullet(self, direction):
