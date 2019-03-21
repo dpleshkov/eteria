@@ -82,6 +82,7 @@ function onBoardCalculations() {
     })
     var t2 = Date.now();
     runningTime = t2 - t1;
+    data[1] = entities;
     setTimeout(onBoardCalculations, 1);
 }
 
@@ -156,7 +157,6 @@ socket.on("playerInfoResponse", function(stuff) {
     if (data) {
         var dx = stuff[0].x - data[0].x;
         var dy = stuff[0].y - data[0].y;
-        console.log(dx, dy);
     }
     data = stuff;
     ping = Date.now() - time;
