@@ -13,14 +13,14 @@ app = Flask(__name__)
 app.secret_key = "taksa tapka"
 socketio = SocketIO(app)
 sys.setrecursionlimit(100000)
-game = Game()
+game = Game(2000)
 for _ in range(0, 500):
-    Wall(game, random.randint(-2000, 2000), random.randint(-2000, 2000))
+    Wall(game, random.randint(-game.radius, game.radius), random.randint(-game.radius, game.radius))
 for _ in range(0, 0):
-    coin = Coin(game, random.randint(-2000, 2000), random.randint(-2000, 2000), 1)
+    coin = Coin(game, random.randint(-game.radius, game.radius), random.randint(-game.radius, game.radius), 1)
     while coin.colliding():
         coin.delete()
-        coin = Coin(game, random.randint(-2000, 2000), random.randint(-2000, 2000), 1)
+        coin = Coin(game, random.randint(-game.radius, game.radius), random.randint(-game.radius, game.radius), 1)
 players = dict()
 
 
@@ -43,7 +43,7 @@ def connect():
 
 @socketio.on("playerRequest")
 def add_player(data):
-    player = Player(game, random.randint(-1000, 1000), random.randint(-1000, 1000), data["name"])
+    player = Player(game, random.randint(-game.radius, game.radius), random.randint(-game.radius, game.radius), data["name"])
     #  The client already knows that we are going to initialize a new player, but they don't know the coordinates
     players[data["token"]] = player
     print("Assigned #"+data["token"]+" a new player object with name "+data["name"])
