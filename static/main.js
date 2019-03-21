@@ -82,6 +82,7 @@ function onBoardCalculations() {
     })
     var t2 = Date.now();
     runningTime = t2 - t1;
+    setTimeout(onBoardCalculations, 1);
 }
 
 function render(timestamp) {
