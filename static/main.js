@@ -15,6 +15,7 @@ var time = Date.now();
 var data;
 var rendering = false;
 var ping = 40;
+var reloading = false;
 var runningTime = 1;
 var firing = false;
 var keysDown = {
@@ -145,9 +146,12 @@ function render(timestamp) {
         ctx.font = "100px Arial";
         ctx.textAlign = "center";
         ctx.fillText("You died :(", 300 * scale, 300 * scale);
-        setTimeout(function() {
-            location.reload(true)
-        }, 3000);
+        if (!reloading) {
+            setTimeout(function() {
+                location.reload(true)
+            }, 1000);
+            reloading = true;
+        }
     }
     var time2 = Date.now();
     var diff = time2 - time1;
