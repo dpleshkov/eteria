@@ -8,13 +8,13 @@ class Game:
         self.entities = set()
         self.running_time = 0.01
         self.radius = radius
+        self.last_time = time.time()
 
     def update(self):
-        t1 = time.time()
+        self.running_time = round((time.time()-self.last_time)*1000)
+        self.last_time = time.time()
         for entity in list(self.entities):
             entity.act()
-        t2 = time.time()
-        self.running_time = round((t2-t1)*1000)
         thr = threading.Thread(target=self.update)
         thr.start()
 

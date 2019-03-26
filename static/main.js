@@ -77,13 +77,27 @@ $("#nameForm").submit(function(evt) { // Sends our name to the server
 function onBoardCalculations() {
     var t1 = Date.now();
     var entities = data[1];
+    var player = data[0];
     entities.forEach(function(entity) {
         entity.x += entity.vel_x * (runningTime / 40);
         entity.y += entity.vel_y * (runningTime / 40);
     })
+    if (keysDown.w) {
+        player.vel_y += -5;
+    }
+    if (keysDown.s) {
+        player.vel_y += 5;
+    }
+    if (keysDown.a) {
+        player.vel_x += -5;
+    }
+    if (keysDown.d) {
+        player.vel_x += 5;
+    }
     var t2 = Date.now();
     runningTime = t2 - t1;
     data[1] = entities;
+    console.log(data[1]===entities);
     setTimeout(onBoardCalculations, 1);
 }
 
