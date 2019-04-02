@@ -5,14 +5,14 @@ ctx.textAlign = "center";
 canvas.width = $(document).height();
 canvas.height = $(document).height();
 document.body.style.overflow = "hidden";
-
+ctx.imageSmoothingEnabled = true;
 
 
 var token;
 var angle = 0;
 var actualAngle = 0;
 var time = Date.now();
-var data;
+var data = [{}, []];
 var rendering = false;
 var ping = 40;
 var reloading = false;
@@ -71,7 +71,10 @@ $("#nameForm").submit(function(evt) { // Sends our name to the server
         name: name
     });
     document.getElementById("main").style = "display: none";
+    window.requestAnimationFrame(render);
+    onBoardCalculations();
     evt.preventDefault();
+
 });
 
 function onBoardCalculations() {
@@ -179,11 +182,6 @@ socket.on("playerInfoResponse", function(stuff) {
     data = stuff;
     ping = Date.now() - time;
     time = Date.now();
-    if (!rendering) {
-        window.requestAnimationFrame(render);
-        onBoardCalculations();
-        rendering = true;
-    }
     var int;
     if (ping < 17) {
         int = 17-ping;
