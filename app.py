@@ -8,7 +8,7 @@ import sys
 import math
 import time
 
-
+print("Eteria: Game environment being initialized, please wait...")
 app = Flask(__name__)
 app.secret_key = "taksa tapka"
 socketio = SocketIO(app)
@@ -22,6 +22,7 @@ for _ in range(0, 0):
         coin.delete()
         coin = Coin(game, random.randint(-game.radius, game.radius), random.randint(-game.radius, game.radius), 1)
 players = dict()
+print("Eteria: Game environment initialized, starting server...")
 
 
 @app.route("/")
@@ -73,8 +74,10 @@ def send_info(data):
     players[data["token"]].set_velocity(vx, vy)
     emit("playerInfoResponse", [players[data["token"]].jsonify(), players[data["token"]].view, game.running_time])
 
-
+if __name__ == "app":
+    print("Running on module app")
+    game.update()
 if __name__ == '__main__':
     game.update()
-    print("Running")
+    print("Running on module __main__")
     socketio.run(app, port=os.environ.get("PORT"), host="0.0.0.0")
