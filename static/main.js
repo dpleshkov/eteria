@@ -26,7 +26,10 @@ var keysDown = {
 }
 var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
 
-
+var oldName = window.localStorage.getItem("name");
+if (oldName) {
+    document.getElementById("name").value = oldName;
+}
 function radians(degrees) {
     return degrees / 180 * Math.PI;
 }
@@ -71,8 +74,7 @@ $("#nameForm").submit(function(evt) { // Sends our name to the server
         name: name
     });
     document.getElementById("main").style = "display: none";
-    window.requestAnimationFrame(render);
-    onBoardCalculations();
+    window.localStorage.setItem("name", name);
     evt.preventDefault();
 
 });
@@ -178,7 +180,6 @@ socket.on("playerInfoResponse", function(stuff) {
         var dx = stuff[0].x - data[0].x;
         var dy = stuff[0].y - data[0].y;
     }
-    console.log(data);
     data = stuff;
     ping = Date.now() - time;
     time = Date.now();
@@ -208,3 +209,5 @@ socket.on("playerInfoResponse", function(stuff) {
         })
     }, int);
 });
+window.requestAnimationFrame(render);
+onBoardCalculations();
