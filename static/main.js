@@ -78,7 +78,7 @@ $("#nameForm").submit(function(evt) { // Sends our name to the server
     evt.preventDefault();
 
 });
-
+var calculationsLastTime = Date.now();
 function onBoardCalculations() {
     var t1 = Date.now();
     var entities = data[1];
@@ -107,6 +107,7 @@ function onBoardCalculations() {
 
 function render(timestamp) {
     var time1 = timestamp;
+    console.log(Date.now() - calculationsLastTime);
     var scale = canvas.width / 600;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "#000000";
@@ -173,6 +174,7 @@ function render(timestamp) {
     }
     var time2 = Date.now();
     var diff = time2 - time1;
+    calculationsLastTime = Date.now();
     window.requestAnimationFrame(render);
 }
 socket.on("playerInfoResponse", function(stuff) {

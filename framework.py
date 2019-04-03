@@ -9,6 +9,7 @@ class Game:
         self.running_time = 0.01
         self.radius = radius
         self.last_time = time.time()
+        self.mapped_entities = dict()
 
     def update(self):
         self.running_time = round((time.time()-self.last_time)*1000)
@@ -20,6 +21,10 @@ class Game:
 
     def add_entity(self, entity):
         self.entities.add(entity)
+        #if entity.it in self.mapped_entities:
+        #    self.mapped_entities[entity.it].append(entity)
+        #else:
+        #    self.mapped_entities[entity.it] = [entity]
 
     def remove_entity(self, entity):
         self.entities.remove(entity)
@@ -28,7 +33,6 @@ class Game:
 class Entity:
     def __init__(self, game, x, y):
         self.game = game
-        self.game.add_entity(self)
         self.x = x
         self.y = y
         self.vel_x = 0
@@ -36,6 +40,7 @@ class Entity:
         self.radius = 0
         self.it = "entity"
         self.color = "#ffffff"
+        self.game.add_entity(self)
 
     def delete(self):
         self.game.remove_entity(self)
