@@ -50,8 +50,8 @@ class Entity:
 
     def act(self):
         now = time.time()
-        self.x += self.vel_x * (now - self.last_updated) * 50
-        self.y += self.vel_y * (now - self.last_updated) * 50
+        self.x += self.vel_x * (now - self.last_updated) * 25
+        self.y += self.vel_y * (now - self.last_updated) * 25
         self.last_updated = time.time()
 
     def colliding(self):

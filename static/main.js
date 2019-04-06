@@ -89,8 +89,8 @@ function onBoardCalculations() {
     var player = data[0];
     entities.forEach(function(entity) {
         var now = Date.now() * 1000;
-        entity.x += entity.vel_x * (now - entity.last_updated) * 50;
-        entity.y += entity.vel_y * (now - entity.last_updated) * 50;
+        entity.x += entity.vel_x * (now - entity.last_updated) * 25;
+        entity.y += entity.vel_y * (now - entity.last_updated) * 25;
         entity.last_updated = now;
     })
     if (keysDown.w) {
