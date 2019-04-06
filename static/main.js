@@ -192,7 +192,7 @@ function render(timestamp) {
     if (bullets) {
         bullets.forEach(renderEntity);
     }
-    if (tree) {
+    if (trees) {
         trees.forEach(renderEntity);
     }
     if (player.dead) {
