@@ -12,7 +12,9 @@ var token;
 var angle = 0;
 var actualAngle = 0;
 var time = Date.now();
-var data = [{}, []];
+var data = [{},
+    []
+];
 var rendering = false;
 var ping = 40;
 var reloading = false;
@@ -30,6 +32,7 @@ var oldName = window.localStorage.getItem("name");
 if (oldName) {
     document.getElementById("name").value = oldName;
 }
+
 function radians(degrees) {
     return degrees / 180 * Math.PI;
 }
@@ -79,14 +82,15 @@ $("#nameForm").submit(function(evt) { // Sends our name to the server
 
 });
 var calculationsLastTime = Date.now();
+
 function onBoardCalculations() {
     var t1 = Date.now();
     var entities = data[1];
     var player = data[0];
     entities.forEach(function(entity) {
-        var now = Date.now()*1000;
-        entity.x += entity.vel_x * (now-entity.last_updated) * 50;
-        entity.y += entity.vel_y * (now-entity.last_updated) * 50;
+        var now = Date.now() * 1000;
+        entity.x += entity.vel_x * (now - entity.last_updated) * 50;
+        entity.y += entity.vel_y * (now - entity.last_updated) * 50;
         entity.last_updated = now;
     })
     if (keysDown.w) {
@@ -106,6 +110,7 @@ function onBoardCalculations() {
     data[1] = entities;
     setTimeout(onBoardCalculations, 1);
 }
+
 function renderEntity(entity) {
     var player = data[0];
     var scale = canvas.width / 600;
@@ -113,7 +118,7 @@ function renderEntity(entity) {
     let cy = entity.y - player.y + 300;
     ctx.fillStyle = entity.color;
     ctx.strokeStyle = entity.outline;
-    ctx.lineWidth = 3*scale;
+    ctx.lineWidth = 3 * scale;
     ctx.beginPath();
     ctx.arc(cx * scale, cy * scale, entity.radius * scale, 0, 2 * Math.PI);
     ctx.fill();
@@ -128,22 +133,22 @@ function renderEntity(entity) {
         ctx.beginPath();
         ctx.strokeStyle = "#999999";
         ctx.lineCap = "round";
-        ctx.lineWidth = 10*scale;
-        ctx.moveTo(cx*scale, cy*scale);
+        ctx.lineWidth = 10 * scale;
+        ctx.moveTo(cx * scale, cy * scale);
         //ctx.lineTo(cx*scale+5, cy*scale+5);
-        ctx.lineTo((cx*scale)+(Math.cos(radians(entity.direction))*scale*50), (cy*scale)+(Math.sin(radians(entity.direction))*scale*50));
+        ctx.lineTo((cx * scale) + (Math.cos(radians(entity.direction)) * scale * 50), (cy * scale) + (Math.sin(radians(entity.direction)) * scale * 50));
         ctx.stroke();
         ctx.beginPath();
         ctx.strokeStyle = "#aa0000";
         ctx.lineCap = "round";
-        ctx.lineWidth = 10*scale;
+        ctx.lineWidth = 10 * scale;
         ctx.moveTo(cx * scale - (20 * scale), cy * scale + (40 * scale));
         ctx.lineTo(cx * scale + (20 * scale), cy * scale + (40 * scale));
         ctx.stroke();
         ctx.beginPath();
         ctx.strokeStyle = "#00aa00";
         ctx.lineCap = "round";
-        ctx.lineWidth = 8*scale;
+        ctx.lineWidth = 8 * scale;
         if (entity.hp > 0) {
             let healthThing = entity.hp / 2.5;
             ctx.beginPath();
@@ -161,6 +166,7 @@ function renderEntity(entity) {
         ctx.globalAlpha = 1;
     }
 }
+
 function render(timestamp) {
     if (!data[3]) {
         window.requestAnimationFrame(render);
@@ -180,9 +186,15 @@ function render(timestamp) {
     var trees = data[3].tree;
     var players = data[3].player;
     var bullets = data[3].bullet;
-    players.forEach(renderEntity);
-    bullets.forEach(renderEntity);
-    trees.forEach(renderEntity);
+    if (players) {
+        players.forEach(renderEntity);
+    }
+    if (bullets) {
+        bullets.forEach(renderEntity);
+    }
+    if (tree) {
+        trees.forEach(renderEntity);
+    }
     if (player.dead) {
         ctx.fillStyle = "#ff0000";
         ctx.font = "100px Arial";
@@ -210,7 +222,7 @@ socket.on("playerInfoResponse", function(stuff) {
     time = Date.now();
     var int;
     if (ping < 17) {
-        int = 17-ping;
+        int = 17 - ping;
     } else {
         int = 1;
     }
