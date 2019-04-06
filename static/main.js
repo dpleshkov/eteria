@@ -84,8 +84,10 @@ function onBoardCalculations() {
     var entities = data[1];
     var player = data[0];
     entities.forEach(function(entity) {
-        entity.x += entity.vel_x * (runningTime / 40);
-        entity.y += entity.vel_y * (runningTime / 40);
+        var now = Date.now()*1000;
+        entity.x += entity.vel_x * (now-entity.last_updated) * 50;
+        entity.y += entity.vel_y * (now-entity.last_updated) * 50;
+        entity.last_updated = now;
     })
     if (keysDown.w) {
         player.vel_y += -5;
@@ -104,10 +106,67 @@ function onBoardCalculations() {
     data[1] = entities;
     setTimeout(onBoardCalculations, 1);
 }
-
+function renderEntity(entity) {
+    var player = data[0];
+    var scale = canvas.width / 600;
+    let cx = entity.x - player.x + 300;
+    let cy = entity.y - player.y + 300;
+    ctx.fillStyle = entity.color;
+    ctx.strokeStyle = entity.outline;
+    ctx.lineWidth = 3*scale;
+    ctx.beginPath();
+    ctx.arc(cx * scale, cy * scale, entity.radius * scale, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.stroke();
+    if (entity.name !== undefined) {
+        ctx.fillStyle = "#ffffff";
+        ctx.textAlign = "center";
+        ctx.font = "16px Arial";
+        ctx.fillText(entity.name, cx * scale, cy * scale + 30 * scale);
+    }
+    if (entity.it == "player") {
+        ctx.beginPath();
+        ctx.strokeStyle = "#999999";
+        ctx.lineCap = "round";
+        ctx.lineWidth = 10*scale;
+        ctx.moveTo(cx*scale, cy*scale);
+        //ctx.lineTo(cx*scale+5, cy*scale+5);
+        ctx.lineTo((cx*scale)+(Math.cos(radians(entity.direction))*scale*50), (cy*scale)+(Math.sin(radians(entity.direction))*scale*50));
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.strokeStyle = "#aa0000";
+        ctx.lineCap = "round";
+        ctx.lineWidth = 10*scale;
+        ctx.moveTo(cx * scale - (20 * scale), cy * scale + (40 * scale));
+        ctx.lineTo(cx * scale + (20 * scale), cy * scale + (40 * scale));
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.strokeStyle = "#00aa00";
+        ctx.lineCap = "round";
+        ctx.lineWidth = 8*scale;
+        if (entity.hp > 0) {
+            let healthThing = entity.hp / 2.5;
+            ctx.beginPath();
+            ctx.moveTo(cx * scale - (20 * scale), cy * scale + (40 * scale));
+            ctx.lineTo(cx * scale + ((healthThing - 20) * scale), cy * scale + (40 * scale));
+            ctx.stroke();
+        }
+    }
+    if (entity.it == "tree") {
+        ctx.beginPath();
+        ctx.fillStyle = "#53840a";
+        ctx.globalAlpha = 0.6;
+        ctx.arc(cx * scale, cy * scale, entity.radius * scale * 5, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+    }
+}
 function render(timestamp) {
+    if (!data[3]) {
+        window.requestAnimationFrame(render);
+        return;
+    }
     var time1 = timestamp;
-    console.log(Date.now() - calculationsLastTime);
     var scale = canvas.width / 600;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "#000000";
@@ -118,48 +177,12 @@ function render(timestamp) {
     ctx.fillText(ping + "ms", 20 * scale, 20 * scale);
     var player = data[0];
     var entities = data[1];
-    entities.forEach(function(entity) {
-        let cx = entity.x - player.x + 300;
-        let cy = entity.y - player.y + 300;
-        ctx.fillStyle = entity.color;
-        ctx.beginPath();
-        ctx.arc(cx * scale, cy * scale, entity.radius * scale, 0, 2 * Math.PI);
-        ctx.fill();
-        if (entity.name !== undefined) {
-            ctx.fillStyle = "#ffffff";
-            ctx.textAlign = "center";
-            ctx.font = "16px Arial";
-            ctx.fillText(entity.name, cx * scale, cy * scale + 30 * scale);
-        }
-        if (entity.it == "player") {
-            ctx.beginPath();
-            ctx.strokeStyle = "#999999";
-            ctx.lineCap = "round";
-            ctx.lineWidth = 10;
-            ctx.moveTo(cx*scale, cy*scale);
-            //ctx.lineTo(cx*scale+5, cy*scale+5);
-            ctx.lineTo((cx*scale)+(Math.cos(radians(entity.direction))*scale*50), (cy*scale)+(Math.sin(radians(entity.direction))*scale*50));
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.strokeStyle = "#aa0000";
-            ctx.lineCap = "round";
-            ctx.lineWidth = 10;
-            ctx.moveTo(cx * scale - (20 * scale), cy * scale + (40 * scale));
-            ctx.lineTo(cx * scale + (20 * scale), cy * scale + (40 * scale));
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.strokeStyle = "#00aa00";
-            ctx.lineCap = "round";
-            ctx.lineWidth = 8;
-            if (entity.hp > 0) {
-                let healthThing = entity.hp / 2.5;
-                ctx.beginPath();
-                ctx.moveTo(cx * scale - (20 * scale), cy * scale + (40 * scale));
-                ctx.lineTo(cx * scale + ((healthThing - 20) * scale), cy * scale + (40 * scale));
-                ctx.stroke();
-            }
-        }
-    });
+    var trees = data[3].tree;
+    var players = data[3].player;
+    var bullets = data[3].bullet;
+    players.forEach(renderEntity);
+    bullets.forEach(renderEntity);
+    trees.forEach(renderEntity);
     if (player.dead) {
         ctx.fillStyle = "#ff0000";
         ctx.font = "100px Arial";
@@ -174,9 +197,9 @@ function render(timestamp) {
     }
     var time2 = Date.now();
     var diff = time2 - time1;
-    calculationsLastTime = Date.now();
     window.requestAnimationFrame(render);
 }
+
 socket.on("playerInfoResponse", function(stuff) {
     if (data) {
         var dx = stuff[0].x - data[0].x;

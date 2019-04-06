@@ -10,12 +10,12 @@ import time
 
 print("Eteria: Game environment being initialized, please wait...")
 app = Flask(__name__)
-app.secret_key = "taksa tapka"
+app.secret_key = "bruh moment"
 socketio = SocketIO(app)
 sys.setrecursionlimit(100000)
-game = Game(2000)
-for _ in range(0, 500):
-    Wall(game, random.randint(-game.radius, game.radius), random.randint(-game.radius, game.radius))
+game = Game(500)
+for _ in range(0, 25):
+    Tree(game, random.randint(-game.radius, game.radius), random.randint(-game.radius, game.radius))
 for _ in range(0, 0):
     coin = Coin(game, random.randint(-game.radius, game.radius), random.randint(-game.radius, game.radius), 1)
     while coin.colliding():
@@ -48,7 +48,7 @@ def add_player(data):
     #  The client already knows that we are going to initialize a new player, but they don't know the coordinates
     players[data["token"]] = player
     print("Assigned #"+data["token"]+" a new player object with name "+data["name"])
-    emit("playerInfoResponse", [players[data["token"]].jsonify(), players[data["token"]].view])
+    emit("playerInfoResponse", [players[data["token"]].jsonify(), players[data["token"]].view, game.running_time, players[data["token"]].mapped_view])
 
 
 @socketio.on("playerInfoRequest")
@@ -72,7 +72,7 @@ def send_info(data):
     if data["keysDown"]["d"]:
         vx += 5
     players[data["token"]].set_velocity(vx, vy)
-    emit("playerInfoResponse", [players[data["token"]].jsonify(), players[data["token"]].view, game.running_time])
+    emit("playerInfoResponse", [players[data["token"]].jsonify(), players[data["token"]].view, game.running_time, players[data["token"]].mapped_view])
 
 if __name__ == "app":
     print("Running on module app")

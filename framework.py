@@ -41,14 +41,18 @@ class Entity:
         self.it = "entity"
         self.color = "#ffffff"
         self.game.add_entity(self)
+        self.last_updated = time.time()
+        self.outline = "#ffffff"
 
     def delete(self):
         self.game.remove_entity(self)
         del self
 
     def act(self):
-        self.x += self.vel_x * (self.game.running_time/40)
-        self.y += self.vel_y * (self.game.running_time/40)
+        now = time.time()
+        self.x += self.vel_x * (now - self.last_updated) * 50
+        self.y += self.vel_y * (now - self.last_updated) * 50
+        self.last_updated = time.time()
 
     def colliding(self):
         for entity in self.game.entities:
@@ -73,7 +77,9 @@ class Entity:
             "it": self.it,
             "color": self.color,
             "vel_x": self.vel_x,
-            "vel_y": self.vel_y
+            "vel_y": self.vel_y,
+            "last_updated": self.last_updated,
+            "outline": self.outline
         }
 
 
@@ -92,6 +98,15 @@ class Wall(Entity):
         self.radius = 50
         self.it = "wall"
         self.color = "#ffffff"
+        self.outline = "#aaaaaa"
+
+class Tree(Entity):
+    def __init__(self, game, x, y):
+        Entity.__init__(self, game, x, y)
+        self.radius = 25
+        self.it = "tree"
+        self.color = "#533118"
+        self.outline = "#975445"
 
 
 class Bullet(Entity):
@@ -99,7 +114,8 @@ class Bullet(Entity):
         Entity.__init__(self, game, x, y)
         self.radius = 5
         self.it = "bullet"
-        self.color = "#ff0000"
+        self.color = "#000000"
+        self.outline = "#aaaaaa"
         self.sender = sender
         self.vel_x = vel_x
         self.vel_y = vel_y
@@ -119,6 +135,8 @@ class Player(Entity):
         self.score = 0
         self.view = list()
         self.it = "player"
+        self.color = "#dabdab"
+        self.outline = "#777777"
         self.ping = time.time()
         self.hp = 100
         self.velocity_queue = [0, 0]
@@ -126,6 +144,7 @@ class Player(Entity):
         self.dead = False
         self.dying_timer = time.time()
         self.direction = 0
+        self.mapped_view = dict()
 
     def set_velocity(self, vel_x, vel_y):
         if self.dead:
@@ -146,21 +165,33 @@ class Player(Entity):
             return
         vx = math.cos(math.radians(direction))
         vy = math.sin(math.radians(direction))
-        if (time.time() - self.last_fired > 0.5):
-            Bullet(self.game, self.x, self.y, self, vx*25, vy*25)
+        if (time.time() - self.last_fired > 0.2):
+            Bullet(self.game, self.x, self.y, self, vx*15, vy*15)
             self.last_fired = time.time()
 
     def handle_collisions(self):
         self.new_view = list()
+        new_mapped_view = {
+            "wall": list(),
+            "player": list(),
+            "entity": list(),
+            "bullet": list(),
+            "tree": list(),
+            "coin": list()
+        }
         velocity_queue = self.velocity_queue
         for entity in list(self.game.entities):
             if abs(self.x-entity.x) < 300+entity.radius and abs(self.y-entity.y) < 300+entity.radius:
                 self.new_view.append(entity.jsonify())
+                new_mapped_view[entity.it].append(entity.jsonify())
+            elif type(entity) == Tree and abs(self.x-entity.x) < 300+entity.radius*5 and abs(self.y-entity.y) < 300+entity.radius*5:
+                self.new_view.append(entity.jsonify())
+                new_mapped_view[entity.it].append(entity.jsonify())
             if self.colliding_with(entity):
                 if type(entity) == Coin:
                     self.score += entity.value
                     entity.delete()
-                if type(entity) == Wall:
+                if type(entity) == Wall or type(entity) == Tree:
                     if entity.y > self.y and velocity_queue[1] > 0:
                         velocity_queue[1] = -velocity_queue[1]
                     if entity.y < self.y and velocity_queue[1] < 0:
@@ -176,6 +207,7 @@ class Player(Entity):
 
 
         self.view = self.new_view
+        self.mapped_view = new_mapped_view
         if not self.dead:
             self.vel_x = velocity_queue[0]
             self.vel_y = velocity_queue[1]
@@ -205,5 +237,7 @@ class Player(Entity):
             "vel_x": self.vel_x,
             "vel_y": self.vel_y,
             "dead": self.dead,
-            "direction": self.direction
+            "direction": self.direction,
+            "last_updated": self.last_updated,
+            "outline": self.outline
         }
