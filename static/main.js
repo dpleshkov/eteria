@@ -19,6 +19,9 @@ var rendering = false;
 var ping = 40;
 var reloading = false;
 var runningTime = 1;
+var currentFps = 0;
+var fps = 0;
+var fpsCut = Date.now();
 var firing = false;
 var keysDown = {
     "w": false,
@@ -177,10 +180,6 @@ function render(timestamp) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "#000000";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "#ffffff";
-    ctx.textAlign = "left";
-    ctx.font = "16px Arial";
-    ctx.fillText(ping + "ms", 20 * scale, 20 * scale);
     var player = data[0];
     var entities = data[1];
     var trees = data[3].tree;
@@ -207,8 +206,24 @@ function render(timestamp) {
             reloading = true;
         }
     }
+    ctx.fillStyle = "#ffffff";
+    ctx.textAlign = "left";
+    ctx.font = "16px Arial";
+    ctx.fillText(ping + "ms", 20 * scale, 20 * scale);
+    ctx.fillStyle = "#ffffff";
+    ctx.textAlign = "right";
+    ctx.font = "16px Arial";
+    ctx.fillText(fps + " fps", 570 * scale, 20 * scale);
     var time2 = Date.now();
     var diff = time2 - time1;
+    if (Date.now() - fpsCut > 1000) {
+        fps = currentFps;
+        fpsCut = Date.now();
+        currentFps = 0;
+    } else {
+        currentFps += 1;
+    }
+
     window.requestAnimationFrame(render);
 }
 
