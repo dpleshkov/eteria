@@ -168,6 +168,10 @@ function renderEntity(entity) {
         ctx.fill();
         ctx.globalAlpha = 1;
     }
+    var now = Date.now() / 1000;
+    entity.x += entity.vel_x * (now - entity.last_updated) * 25;
+    entity.y += entity.vel_y * (now - entity.last_updated) * 25;
+    entity.last_updated = now;
 }
 
 function render(timestamp) {
