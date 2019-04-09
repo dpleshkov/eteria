@@ -87,7 +87,7 @@ $("#nameForm").submit(function(evt) { // Sends our name to the server
 });
 var calculationsLastTime = Date.now();
 
-function onBoardCalculations() {
+/* function onBoardCalculations() {
     var t1 = Date.now();
     var entities = data[1];
     var player = data[0];
@@ -113,13 +113,12 @@ function onBoardCalculations() {
     runningTime = t2 - t1;
     data[1] = entities;
     setTimeout(onBoardCalculations, 1);
-}
+} */
 function updateEntity(entity) {
     var now = Date.now() / 1000;
     entity.x += entity.vel_x * (now - dataLastUpdated) * 25;
     entity.y += entity.vel_y * (now - dataLastUpdated) * 25;
     entity.last_updated = now;
-    dataLastUpdated = now;
 }
 function renderEntity(entity) {
     var player = data[0];
@@ -207,6 +206,7 @@ function render(timestamp) {
         trees.forEach(updateEntity);
 
     }
+    dataLastUpdated = Date.now()/1000;
     if (player.dead) {
         ctx.fillStyle = "#ff0000";
         ctx.font = "100px Arial";
