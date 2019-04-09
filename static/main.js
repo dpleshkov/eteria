@@ -11,7 +11,7 @@ ctx.imageSmoothingEnabled = true;
 var token;
 var angle = 0;
 var actualAngle = 0;
-var time = Date.now();
+var time = Date.now()/1000;
 var data = [{},
     []
 ];
@@ -23,6 +23,7 @@ var currentFps = 0;
 var fps = 0;
 var fpsCut = Date.now();
 var firing = false;
+var dataLastUpdated = Date.now();
 var keysDown = {
     "w": false,
     "a": false,
@@ -91,7 +92,7 @@ function onBoardCalculations() {
     var entities = data[1];
     var player = data[0];
     entities.forEach(function(entity) {
-        var now = Date.now() * 1000;
+        var now = Date.now() / 1000;
         entity.x += entity.vel_x * (now - entity.last_updated) * 25;
         entity.y += entity.vel_y * (now - entity.last_updated) * 25;
         entity.last_updated = now;
@@ -113,7 +114,13 @@ function onBoardCalculations() {
     data[1] = entities;
     setTimeout(onBoardCalculations, 1);
 }
-
+function updateEntity(entity) {
+    var now = Date.now() / 1000;
+    entity.x += entity.vel_x * (now - dataLastUpdated) * 25;
+    entity.y += entity.vel_y * (now - dataLastUpdated) * 25;
+    entity.last_updated = now;
+    dataLastUpdated = now;
+}
 function renderEntity(entity) {
     var player = data[0];
     var scale = canvas.width / 600;
@@ -168,10 +175,7 @@ function renderEntity(entity) {
         ctx.fill();
         ctx.globalAlpha = 1;
     }
-    var now = Date.now() / 1000;
-    entity.x += entity.vel_x * (now - entity.last_updated) * 25;
-    entity.y += entity.vel_y * (now - entity.last_updated) * 25;
-    entity.last_updated = now;
+
 }
 
 function render(timestamp) {
@@ -184,19 +188,24 @@ function render(timestamp) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "#000000";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    var player = data[0];
     var entities = data[1];
     var trees = data[3].tree;
     var players = data[3].player;
     var bullets = data[3].bullet;
+    updateEntity(data[0]);
+    var player = data[0];
     if (players) {
         players.forEach(renderEntity);
+        players.forEach(updateEntity);
     }
     if (bullets) {
         bullets.forEach(renderEntity);
+        bullets.forEach(updateEntity);
     }
     if (trees) {
         trees.forEach(renderEntity);
+        trees.forEach(updateEntity);
+
     }
     if (player.dead) {
         ctx.fillStyle = "#ff0000";
@@ -237,6 +246,7 @@ socket.on("playerInfoResponse", function(stuff) {
         var dy = stuff[0].y - data[0].y;
     }
     data = stuff;
+    dataLastUpdated = Date.now()/1000;
     ping = Date.now() - time;
     time = Date.now();
     var int;
@@ -266,4 +276,3 @@ socket.on("playerInfoResponse", function(stuff) {
     }, int);
 });
 window.requestAnimationFrame(render);
-onBoardCalculations();
