@@ -125,6 +125,9 @@ function renderEntity(entity) {
     var scale = canvas.width / 600;
     let cx = entity.x - player.x + 300;
     let cy = entity.y - player.y + 300;
+    if (entity.dead) {
+        return;
+    }
     ctx.fillStyle = entity.color;
     ctx.strokeStyle = entity.outline;
     ctx.lineWidth = 3 * scale;
@@ -191,6 +194,18 @@ function render(timestamp) {
     var trees = data[3].tree;
     var players = data[3].player;
     var bullets = data[3].bullet;
+    /*if (keysDown.w) {
+        data[0].vel_y += -5;
+    }
+    if (keysDown.s) {
+        data[0].vel_y += 5;
+    }
+    if (keysDown.a) {
+        data[0].vel_x += -5;
+    }
+    if (keysDown.d) {
+        data[0].vel_x += 5;
+    }*/
     updateEntity(data[0]);
     var player = data[0];
     if (players) {

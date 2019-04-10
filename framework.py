@@ -21,10 +21,10 @@ class Game:
 
     def add_entity(self, entity):
         self.entities.add(entity)
-        #if entity.it in self.mapped_entities:
-        #    self.mapped_entities[entity.it].append(entity)
-        #else:
-        #    self.mapped_entities[entity.it] = [entity]
+        if entity.it in self.mapped_entities:
+            self.mapped_entities[entity.it].append(entity)
+        else:
+            self.mapped_entities[entity.it] = [entity]
 
     def remove_entity(self, entity):
         self.entities.remove(entity)
@@ -127,6 +127,19 @@ class Bullet(Entity):
             self.delete()
 
 
+class Enemy(Entity):
+    def __init__(self, game, x, y, name):
+        Entity.__init__(self, game, x, y)
+        self.name = name
+        self.radius = 30
+        self.hp = 100
+        self.last_fired = time.time()
+        self.it = "enemy"
+
+    def act(self):
+        pass
+
+
 class Player(Entity):
     def __init__(self, game, x, y, name):
         Entity.__init__(self, game, x, y)
@@ -166,7 +179,7 @@ class Player(Entity):
         vx = math.cos(math.radians(direction))
         vy = math.sin(math.radians(direction))
         if (time.time() - self.last_fired > 0.2):
-            Bullet(self.game, self.x, self.y, self, vx*15, vy*15)
+            Bullet(self.game, self.x, self.y, self, vx*25, vy*25)
             self.last_fired = time.time()
 
     def handle_collisions(self):
@@ -214,7 +227,7 @@ class Player(Entity):
 
     def act(self):
         if time.time() - self.ping >= 3:
-            print("Player "+self.name+" has disconnected")
+            print("Eteria: Game: Player "+self.name+" has disconnected")
             self.delete()
         if self.hp <= 0:
             self.dead = True

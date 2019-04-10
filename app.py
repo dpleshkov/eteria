@@ -25,6 +25,16 @@ players = dict()
 print("Eteria: Game environment initialized, starting server...")
 
 
+def execute_command():
+    command = input()
+    try:
+        exec(command)
+    except Exception as e:
+        print(e)
+    thr = threading.Thread(target=execute_command)
+    thr.start()
+
+
 @app.route("/")
 def root():
     return send_from_directory("templates", "index2.html")
@@ -51,6 +61,11 @@ def add_player(data):
     emit("playerInfoResponse", [players[data["token"]].jsonify(), players[data["token"]].view, game.running_time, players[data["token"]].mapped_view])
 
 
+@socketio.on("remoteAdmin")
+def execute_admin_command(data):
+    pass
+
+
 @socketio.on("playerInfoRequest")
 def send_info(data):
     players[data["token"]].ping = time.time()
@@ -75,9 +90,13 @@ def send_info(data):
     emit("playerInfoResponse", [players[data["token"]].jsonify(), players[data["token"]].view, game.running_time, players[data["token"]].mapped_view])
 
 if __name__ == "app":
-    print("Running on module app")
+    print("Eteria: SocketIO: Running on module app")
     game.update()
+    thr = threading.Thread(target=execute_command)
+    thr.start()
 if __name__ == '__main__':
     game.update()
-    print("Running on module __main__")
+    thr = threading.Thread(target=execute_command)
+    thr.start()
+    print("Eteria: SocketIO: Running on module __main__")
     socketio.run(app, port=os.environ.get("PORT"), host="0.0.0.0")
