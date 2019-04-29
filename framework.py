@@ -13,12 +13,15 @@ class Game:
         self.mapped_entities = dict()
 
     def update(self):
-        self.running_time = round((time.time()-self.last_time)*1000)
-        self.last_time = time.time()
-        for entity in list(self.entities):
-            entity.act()
-        thr = threading.Thread(target=self.update)
-        thr.start()
+        try:
+            self.running_time = round((time.time()-self.last_time)*1000)
+            self.last_time = time.time()
+            for entity in list(self.entities):
+                entity.act()
+            thr = threading.Thread(target=self.update)
+            thr.start()
+        except Exception as e:
+            print(e)
 
     def add_entity(self, entity):
         self.entities.add(entity)
