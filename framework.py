@@ -1,3 +1,4 @@
+from functions import *
 import time
 import math
 import threading
@@ -47,6 +48,9 @@ class Entity:
     def delete(self):
         self.game.remove_entity(self)
         del self
+
+    def distance_to(self, entity):
+        return distance(self.x, self.y, entity.x, entity.y)
 
     def act(self):
         now = time.time()
@@ -135,6 +139,18 @@ class Enemy(Entity):
         self.hp = 100
         self.last_fired = time.time()
         self.it = "enemy"
+        self.target = None  # The player the Enemy is currently attacking
+
+    def find_nearest_player(self):  # Find the nearest player
+        nearest_player = None
+        for entity in self.game.entities:
+            if entity.it == "player":
+                if nearest_player:
+                    if self.distance_to(entity) > self.distance_to(nearest_player):
+                        nearest_player = entity
+                else:
+                    nearest_player = entity
+        return nearest_player
 
     def act(self):
         pass
