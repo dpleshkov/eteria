@@ -21,6 +21,7 @@ class Game:
             thr = threading.Thread(target=self.update)
             thr.start()
         except Exception as e:
+            print("Etera: Game: Error")
             print(e)
 
     def add_entity(self, entity):
