@@ -200,6 +200,7 @@ function render(timestamp) {
     var players = data[3].player;
     var bullets = data[3].bullet;
     var enemies = data[3].enemy;
+    var walls = data[3].wall;
     /*if (keysDown.w) {
         data[0].vel_y += -5;
     }
@@ -217,6 +218,10 @@ function render(timestamp) {
     if (enemies) {
         enemies.forEach(renderEntity);
         enemies.forEach(updateEntity);
+    }
+    if (walls) {
+        walls.forEach(renderEntity);
+        walls.forEach(updateEntity);
     }
     if (players) {
         players.forEach(renderEntity);

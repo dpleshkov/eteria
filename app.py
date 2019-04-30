@@ -14,7 +14,7 @@ app.secret_key = "SOMETHINGSECRET"
 socketio = SocketIO(app)
 sys.setrecursionlimit(100000)
 game = Game(500)
-for x in range(1, 3):
+for x in range(1, 1):
     Enemy(game, random.randint(-game.radius, game.radius), random.randint(-game.radius, game.radius), "EteriaBot")
 for _ in range(0, 25):
     Tree(game, random.randint(-game.radius, game.radius), random.randint(-game.radius, game.radius))

@@ -189,7 +189,7 @@ class Enemy(Entity):
             Enemy(self.game, random.randint(-self.game.radius, self.game.radius), random.randint(-self.game.radius, self.game.radius), self.name)
             if self.last_hitter:
                 self.last_hitter.hp = 100
-                self.last_hitter.score += self.score + 1
+                self.last_hitter.score += 1
             self.delete()
         if self.target:
             if self.target not in self.game.entities:
@@ -213,15 +213,19 @@ class Enemy(Entity):
                         if entity.sender and entity.sender in self.game.entities:
                             self.last_hitter = entity.sender
                         entity.delete()
-                #if type(entity) == Wall or type(entity) == Tree:
-                #    if entity.y > self.y and self.vel_y > 0:
-                #        self.vel_y = -self.vel_y
-                #    if entity.y < self.y and self.vel_y < 0:
-                #        self.vel_y = -self.vel_y# - self.vel_y
-                #    if entity.x > self.x and self.vel_x > 0:
-                #        self.vel_x = -self.vel_x# - self.vel_x
-                #    if entity.x < self.x and self.vel_x < 0:
-                #        self.vel_x = -self.vel_x
+                if type(entity) == Wall or type(entity) == Tree:
+                    if entity.y > self.y and self.vel_y > 0:
+                        self.y -= self.vel_y
+                        self.vel_y = -self.vel_y
+                    if entity.y < self.y and self.vel_y < 0:
+                        self.y -= self.vel_y
+                        self.vel_y = -self.vel_y# - self.vel_y
+                    if entity.x > self.x and self.vel_x > 0:
+                        self.x -= self.vel_x
+                        self.vel_x = -self.vel_x# - self.vel_x
+                    if entity.x < self.x and self.vel_x < 0:
+                        self.x -= self.vel_x
+                        self.vel_x = -self.vel_x
 
 
     def jsonify(self):
