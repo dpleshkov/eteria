@@ -14,16 +14,15 @@ class Game:
         self.mapped_entities = dict()
 
     def update(self):
-        try:
-            self.running_time = round((time.time()-self.last_time)*1000)
-            self.last_time = time.time()
-            for entity in list(self.entities):
+        self.running_time = round((time.time()-self.last_time)*1000)
+        self.last_time = time.time()
+        for entity in list(self.entities):
+            try:
                 entity.act()
-            thr = threading.Thread(target=self.update)
-            thr.start()
-        except Exception as e:
-            print("Error occured in main game thread")
-            print(e)
+            except:
+                print("Error occured while executing act function of entity "+entity.it)
+        thr = threading.Thread(target=self.update)
+        thr.start()
 
     def add_entity(self, entity):
         self.entities.add(entity)
