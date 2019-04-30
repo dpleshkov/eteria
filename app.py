@@ -94,11 +94,11 @@ def send_info(data):
 if __name__ == "app":
     print("Eteria: SocketIO: Running on module app")
     game.update()
-    thr = threading.Thread(target=execute_command)
+    #thr = threading.Thread(target=execute_command)
     thr.start()
 if __name__ == '__main__':
     game.update()
-    thr = threading.Thread(target=execute_command)
+    #thr = threading.Thread(target=execute_command)
     thr.start()
     print("Eteria: SocketIO: Running on module __main__")
     socketio.run(app, port=os.environ.get("PORT"), host="0.0.0.0")
