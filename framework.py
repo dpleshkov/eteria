@@ -19,8 +19,9 @@ class Game:
         for entity in list(self.entities):
             try:
                 entity.act()
-            except:
+            except Exception as e:
                 print("Error occured while executing act function of entity "+entity.it)
+                print(type(e), e)
         thr = threading.Thread(target=self.update)
         thr.start()
 
@@ -32,7 +33,8 @@ class Game:
             self.mapped_entities[entity.it] = [entity]
 
     def remove_entity(self, entity):
-        self.entities.remove(entity)
+        if entity in self.entities:
+            self.entities.remove(entity)
 
 
 class Entity:
