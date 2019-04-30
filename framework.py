@@ -196,8 +196,8 @@ class Enemy(Entity):
                 delta_y = self.target.y - self.y
                 direction = math.atan2(delta_y, delta_x)
                 self.direction = math.degrees(direction)
-                self.vel_x = math.cos(direction)*5
-                self.vel_y = math.sin(direction)*5
+                self.vel_x = math.cos(direction)*3
+                self.vel_y = math.sin(direction)*3
         else:
             self.target = self.find_nearest_player()
         for entity in entities:
@@ -207,15 +207,15 @@ class Enemy(Entity):
                         self.hp -= 10
                         self.last_hitter = entity.sender
                         entity.delete()
-                if type(entity) == Wall or type(entity) == Tree:
-                    if entity.y > self.y and self.vel_y > 0:
-                        self.vel_y = -self.vel_y
-                    if entity.y < self.y and self.vel_y < 0:
-                        self.vel_y = -self.vel_y# - self.vel_y
-                    if entity.x > self.x and self.vel_x > 0:
-                        self.vel_x = -self.vel_x# - self.vel_x
-                    if entity.x < self.x and self.vel_x < 0:
-                        self.vel_x = -self.vel_x
+                #if type(entity) == Wall or type(entity) == Tree:
+                #    if entity.y > self.y and self.vel_y > 0:
+                #        self.vel_y = -self.vel_y
+                #    if entity.y < self.y and self.vel_y < 0:
+                #        self.vel_y = -self.vel_y# - self.vel_y
+                #    if entity.x > self.x and self.vel_x > 0:
+                #        self.vel_x = -self.vel_x# - self.vel_x
+                #    if entity.x < self.x and self.vel_x < 0:
+                #        self.vel_x = -self.vel_x
 
 
     def jsonify(self):
