@@ -208,7 +208,8 @@ class Enemy(Entity):
                 if type(entity) == Bullet:
                     if entity.sender != self:
                         self.hp -= 10
-                        self.last_hitter = entity.sender
+                        if entity.sender and entity.sender in self.game.entities:
+                            self.last_hitter = entity.sender
                         entity.delete()
                 #if type(entity) == Wall or type(entity) == Tree:
                 #    if entity.y > self.y and self.vel_y > 0:
