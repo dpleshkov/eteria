@@ -2,6 +2,7 @@ from functions import *
 import time
 import math
 import threading
+import random
 
 
 class Game:
@@ -13,16 +14,12 @@ class Game:
         self.mapped_entities = dict()
 
     def update(self):
-        try:
-            self.running_time = round((time.time()-self.last_time)*1000)
-            self.last_time = time.time()
-            for entity in list(self.entities):
-                entity.act()
-            thr = threading.Thread(target=self.update)
-            thr.start()
-        except Exception as e:
-            print("Etera: Game: Error")
-            print(e)
+        self.running_time = round((time.time()-self.last_time)*1000)
+        self.last_time = time.time()
+        for entity in list(self.entities):
+            entity.act()
+        thr = threading.Thread(target=self.update)
+        thr.start()
 
     def add_entity(self, entity):
         self.entities.add(entity)
@@ -139,11 +136,17 @@ class Enemy(Entity):
     def __init__(self, game, x, y, name):
         Entity.__init__(self, game, x, y)
         self.name = name
-        self.radius = 30
+        self.radius = 20
         self.hp = 100
         self.last_fired = time.time()
         self.it = "enemy"
+        self.color = "#ff2222"
+        self.direction = 0
+        self.dead = False
+        self.outline = "#ff6666"
         self.target = None  # The player the Enemy is currently attacking
+        self.last_fired = time.time()
+        self.last_hitter = None
 
     def find_nearest_player(self):  # Find the nearest player
         nearest_player = None
@@ -156,8 +159,61 @@ class Enemy(Entity):
                     nearest_player = entity
         return nearest_player
 
+    def fire_bullet(self, direction):
+        if self.dead:
+            return
+        vx = math.cos(math.radians(direction))
+        vy = math.sin(math.radians(direction))
+        if (time.time() - self.last_fired > 0.4):
+            Bullet(self.game, self.x, self.y, self, vx*25, vy*25)
+            self.last_fired = time.time()
+
     def act(self):
-        pass
+        entities = list(self.game.entities)
+        Entity.act(self)
+        if self.hp <= 0:
+            Enemy(self.game, random.randint(-self.game.radius, self.game.radius), random.randint(-self.game.radius, self.game.radius), self.name)
+            self.last_hitter.hp = 100
+            self.delete()
+        if self.target:
+            if self.target not in self.game.entities:
+                self.target = self.find_nearest_player()
+            else:
+                if time.time() - self.last_fired > 0.4:
+                    self.fire_bullet(self.direction)
+                delta_x = self.target.x - self.x
+                delta_y = self.target.y - self.y
+                direction = math.atan2(delta_y, delta_x)
+                self.direction = math.degrees(direction)
+                self.vel_x = math.cos(direction)*5
+                self.vel_y = math.sin(direction)*5
+        else:
+            self.target = self.find_nearest_player()
+        for entity in entities:
+            if self.colliding_with(entity):
+                if entity.it == "bullet":
+                    if entity.sender != self:
+                        self.hp -= 10
+                        self.last_hitter = entity.sender
+                        entity.delete()
+
+
+    def jsonify(self):
+        return {
+            "x": self.x,
+            "y": self.y,
+            "radius": self.radius,
+            "it": self.it,
+            "color": self.color,
+            "vel_x": self.vel_x,
+            "vel_y": self.vel_y,
+            "last_updated": self.last_updated,
+            "outline": self.outline,
+            "hp": self.hp,
+            "direction": self.direction,
+            "dead": self.dead,
+            "name": self.name
+        }
 
 
 class Player(Entity):
@@ -168,7 +224,7 @@ class Player(Entity):
         self.score = 0
         self.view = list()
         self.it = "player"
-        self.color = "#dabdab"
+        self.color = "#eeeeee"
         self.outline = "#777777"
         self.ping = time.time()
         self.hp = 100
@@ -210,7 +266,8 @@ class Player(Entity):
             "entity": list(),
             "bullet": list(),
             "tree": list(),
-            "coin": list()
+            "coin": list(),
+            "enemy": list()
         }
         velocity_queue = self.velocity_queue
         for entity in list(self.game.entities):
@@ -246,6 +303,15 @@ class Player(Entity):
             self.vel_y = velocity_queue[1]
 
     def act(self):
+        ## Hardcoding game wall mechanic
+        if self.x > self.game.radius:
+            self.x = self.game.radius
+        if self.y > self.game.radius:
+            self.y = self.game.radius
+        if self.x < -self.game.radius:
+            self.x = -self.game.radius
+        if self.y < -self.game.radius:
+            self.y = -self.game.radius
         if time.time() - self.ping >= 3:
             print("Eteria: Game: Player "+self.name+" has disconnected")
             self.delete()

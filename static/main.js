@@ -141,7 +141,7 @@ function renderEntity(entity) {
         ctx.font = "16px Arial";
         ctx.fillText(entity.name, cx * scale, cy * scale + 30 * scale);
     }
-    if (entity.it == "player") {
+    if (entity.it == "player" || entity.it == "enemy") {
         ctx.beginPath();
         ctx.strokeStyle = "#999999";
         ctx.lineCap = "round";
@@ -194,6 +194,7 @@ function render(timestamp) {
     var trees = data[3].tree;
     var players = data[3].player;
     var bullets = data[3].bullet;
+    var enemies = data[3].enemy;
     /*if (keysDown.w) {
         data[0].vel_y += -5;
     }
@@ -208,6 +209,10 @@ function render(timestamp) {
     }*/
     updateEntity(data[0]);
     var player = data[0];
+    if (enemies) {
+        enemies.forEach(renderEntity);
+        enemies.forEach(updateEntity);
+    }
     if (players) {
         players.forEach(renderEntity);
         players.forEach(updateEntity);
