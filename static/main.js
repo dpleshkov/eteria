@@ -143,6 +143,11 @@ function renderEntity(entity) {
     }
     if (entity.it == "player" || entity.it == "enemy") {
         ctx.beginPath();
+        ctx.fillStyle = "#ffffff";
+        ctx.textAlign = "center";
+        ctx.font = "16px Arial";
+        ctx.fillText("Score: "+entity.score, cx * scale, cy * scale - 30 * scale);
+        ctx.beginPath();
         ctx.strokeStyle = "#999999";
         ctx.lineCap = "round";
         ctx.lineWidth = 10 * scale;

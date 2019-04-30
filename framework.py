@@ -127,9 +127,14 @@ class Bullet(Entity):
         self.birth_date = time.time()
 
     def act(self):
-        Entity.act(self);
+        Entity.act(self)
+        entities = list(self.game.entities)
         if time.time() - self.birth_date > 5:
             self.delete()
+        for entity in entities:
+            if self.colliding_with(entity):
+                if type(entity) == Wall or type(entity) == Tree:
+                    self.delete()
 
 
 class Enemy(Entity):
@@ -140,18 +145,20 @@ class Enemy(Entity):
         self.hp = 100
         self.last_fired = time.time()
         self.it = "enemy"
-        self.color = "#ff2222"
+        self.color = "#eeeeee"
         self.direction = 0
+        self.score = 0
         self.dead = False
-        self.outline = "#ff6666"
+        self.outline = "#777777"
         self.target = None  # The player the Enemy is currently attacking
         self.last_fired = time.time()
         self.last_hitter = None
+        self.last_targeted = time.time()
 
     def find_nearest_player(self):  # Find the nearest player
         nearest_player = None
         for entity in self.game.entities:
-            if entity.it == "player":
+            if entity.it == "player" or entity.it == "enemy":
                 if nearest_player:
                     if self.distance_to(entity) > self.distance_to(nearest_player):
                         nearest_player = entity
@@ -171,9 +178,13 @@ class Enemy(Entity):
     def act(self):
         entities = list(self.game.entities)
         Entity.act(self)
+        if time.time() - self.last_targeted > 2:
+            self.target = self.find_nearest_player()
         if self.hp <= 0:
             Enemy(self.game, random.randint(-self.game.radius, self.game.radius), random.randint(-self.game.radius, self.game.radius), self.name)
-            self.last_hitter.hp = 100
+            if self.last_hitter:
+                self.last_hitter.hp = 100
+                self.last_hitter.score += self.score + 1
             self.delete()
         if self.target:
             if self.target not in self.game.entities:
@@ -191,11 +202,20 @@ class Enemy(Entity):
             self.target = self.find_nearest_player()
         for entity in entities:
             if self.colliding_with(entity):
-                if entity.it == "bullet":
+                if type(entity) == Bullet:
                     if entity.sender != self:
                         self.hp -= 10
                         self.last_hitter = entity.sender
                         entity.delete()
+                if type(entity) == Wall or type(entity) == Tree:
+                    if entity.y > self.y and self.vel_y > 0:
+                        self.vel_y = -self.vel_y
+                    if entity.y < self.y and self.vel_y < 0:
+                        self.vel_y = -self.vel_y# - self.vel_y
+                    if entity.x > self.x and self.vel_x > 0:
+                        self.vel_x = -self.vel_x# - self.vel_x
+                    if entity.x < self.x and self.vel_x < 0:
+                        self.vel_x = -self.vel_x
 
 
     def jsonify(self):
@@ -212,7 +232,8 @@ class Enemy(Entity):
             "hp": self.hp,
             "direction": self.direction,
             "dead": self.dead,
-            "name": self.name
+            "name": self.name,
+            "score": self.score
         }
 
 
@@ -234,6 +255,7 @@ class Player(Entity):
         self.dying_timer = time.time()
         self.direction = 0
         self.mapped_view = dict()
+        self.last_hitter = None
 
     def set_velocity(self, vel_x, vel_y):
         if self.dead:
@@ -318,6 +340,9 @@ class Player(Entity):
         if self.hp <= 0:
             self.dead = True
             self.dying_timer = time.time()
+            if self.last_hitter:
+                self.last_hitter.hp = 100
+                self.last_hitter.score += self.score + 1
             self.vel_x = 0
             self.vel_y = 0
         Entity.act(self)
