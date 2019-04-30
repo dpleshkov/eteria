@@ -25,10 +25,10 @@ var fpsCut = Date.now();
 var firing = false;
 var dataLastUpdated = Date.now();
 var keysDown = {
-    "w": false,
-    "a": false,
-    "s": false,
-    "d": false
+    "KeyW": false,
+    "KeyA": false,
+    "KeyS": false,
+    "KeyD": false
 }
 var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
 
@@ -46,10 +46,10 @@ socket.on("token", function(data) {
     }
 });
 document.onkeydown = function(evt) {
-    keysDown[evt.key] = true;
+    keysDown[evt.code] = true;
 }
 document.onkeyup = function(evt) {
-    keysDown[evt.key] = false;
+    keysDown[evt.code] = false;
 }
 canvas.onmousemove = function(evt) { // This is the function that changes the player direction when the player moves their mouse.
     var mx = evt.pageX - $('#render').offset().left - (canvas.width / 2);

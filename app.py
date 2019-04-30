@@ -80,13 +80,13 @@ def send_info(data):
     #    players[data["token"]].set_velocity(math.cos(math.radians(data["angle"]))*5, math.sin(math.radians(data["angle"]))*5)
     vx = 0
     vy = 0
-    if data["keysDown"]["w"]:
+    if data["keysDown"]["KeyW"]:
         vy -= 5
-    if data["keysDown"]["s"]:
+    if data["keysDown"]["KeyS"]:
         vy += 5
-    if data["keysDown"]["a"]:
+    if data["keysDown"]["KeyA"]:
         vx -= 5
-    if data["keysDown"]["d"]:
+    if data["keysDown"]["KeyD"]:
         vx += 5
     players[data["token"]].set_velocity(vx, vy)
     emit("playerInfoResponse", [players[data["token"]].jsonify(), players[data["token"]].view, game.running_time, players[data["token"]].mapped_view])
